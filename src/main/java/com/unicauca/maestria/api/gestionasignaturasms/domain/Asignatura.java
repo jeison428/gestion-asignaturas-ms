@@ -1,13 +1,14 @@
 package com.unicauca.maestria.api.gestionasignaturasms.domain;
 
 import com.unicauca.maestria.api.gestionasignaturasms.domain.msestudiantedocente.Docente;
+import com.unicauca.maestria.api.gestionasignaturasms.domain.msestudiantedocente.LineaInvestigacion;
 import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "ASIGNATURAS")
+@Table(name = "asignaturas")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -16,59 +17,57 @@ import java.util.Date;
 public class Asignatura {
 
     @Id
-    @Column(name = "ID_ASIGNATURA")
+    @Column(name = "id_asignatura")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idAsignatura;
 
-//    private DocenteAsignaatura idDocente;
-
-//    private Long idCurso;
-
-    @Column(name = "CODIGO_ASIGNATURA")
+    @Column(name = "codigo_asignatura", unique = true)
     private Long codigoAsignatura;
 
-    @Column(name = "NOMBRE_ASIGNATURA")
+    @Column(name = "nombre_asignatura", unique = true)
     private String nombreAsignatura;
 
-    @Column(name = "ESTADO_ASIGNATURA")
-    private String estadoAsignatura;
+    @Column(name = "estado_asignatura")
+    private Boolean estadoAsignatura;
 
-    @Column(name = "FECHA_APROBACION")
+    @Column(name = "fecha_aprobacion")
     private Date fechaAprobacion;
 
-    @Column(name = "ID_ASIGNATURA")
-    private Long oficioFacultad;
+    @Column(name = "oficio_facultad")
+    private String oficioFacultad;//archivo oficio
 
-    @Column(name = "ID_ASIGNATURA")
-    private Long areaFormacion;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "area_formacion")
+    private AreaFormacion areaFormacion;
 
-    @Column(name = "ID_ASIGNATURA")
+    @Column(name = "tipo_asignatura")
     private String tipoAsignatura;
 
-    @Column(name = "ID_ASIGNATURA")
-    private Long lineaInvestigacionAsignatura;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "linea_investigacion")
+    private LineaInvestigacion lineaInvestigacionAsignatura;
 
-    @Column(name = "ID_ASIGNATURA")
-    private Long creditos;
+    @Column(name = "creditos")
+    private Integer creditos;
 
-    @Column(name = "ID_ASIGNATURA")
-    private String objetivoAsignaturaa;
+    @Column(name = "objetivo_asignatura")
+    private String objetivoAsignatura;
 
-    @Column(name = "ID_ASIGNATURA")
+    @Column(name = "contenido_asignatura")
     private String contenidoAsignatura;
 
-    @Column(name = "ID_ASIGNATURA")
-    private String contenidoProgramatico;
+    @Column(name = "contenido_programatico")
+    private String contenidoProgramatico;//aarchivo pdf
 
-    @Column(name = "ID_ASIGNATURA")
-    private Long microcurriculo;
+    @Column(name = "microcurriculo")
+    private String microcurriculo;//archivo pdf
 
-    @Column(name = "ID_ASIGNATURA")
-    private Long horasPresencial;
+    @Column(name = "horas_presencial")
+    private Integer horasPresencial;
 
-    @Column(name = "ID_ASIGNATURA")
-    private Long horasNoPresencial;
+    @Column(name = "horas_no_presencial")
+    private Integer horasNoPresencial;
 
-    @Column(name = "ID_ASIGNATURA")
-    private Long horasTotal;
+    @Column(name = "horas_total")
+    private Integer horasTotal;
 }

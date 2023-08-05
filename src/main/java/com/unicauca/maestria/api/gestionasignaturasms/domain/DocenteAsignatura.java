@@ -29,5 +29,6 @@ public class DocenteAsignatura {
     @JoinColumn(name = "ID_ASIGNATURA")
     private Asignatura asignatura;
 
-    private String tipo;
+    @Column(name = "DICTA_ASIGNATURA")
+    private Boolean dictaAsignatura;
 }
