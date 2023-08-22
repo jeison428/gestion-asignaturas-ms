@@ -1,5 +1,6 @@
 package com.unicauca.maestria.api.gestionasignaturasms.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -26,5 +27,6 @@ public class AreaFormacion {
     private String descripcion;
 
     @OneToMany(mappedBy = "areaFormacion", fetch = FetchType.LAZY)
+    @JsonBackReference
     private List<Asignatura> asignaturas;
 }

@@ -1,15 +1,23 @@
 package com.unicauca.maestria.api.gestionasignaturasms.services.asignatura;
 
+import com.unicauca.maestria.api.gestionasignaturasms.common.client.ArchivoClient;
+import com.unicauca.maestria.api.gestionasignaturasms.domain.ActaAsignatura;
 import com.unicauca.maestria.api.gestionasignaturasms.domain.Asignatura;
 import com.unicauca.maestria.api.gestionasignaturasms.domain.DocenteAsignatura;
+import com.unicauca.maestria.api.gestionasignaturasms.domain.archivos.Acta;
+import com.unicauca.maestria.api.gestionasignaturasms.domain.msestudiantedocente.Docente;
 import com.unicauca.maestria.api.gestionasignaturasms.dtos.AsignaturaCrearDto;
 import com.unicauca.maestria.api.gestionasignaturasms.dtos.AsignaturaListarDto;
 import com.unicauca.maestria.api.gestionasignaturasms.dtos.CamposUnicosDto;
+import com.unicauca.maestria.api.gestionasignaturasms.dtos.archivos.OficioListarDto;
+import com.unicauca.maestria.api.gestionasignaturasms.dtos.archivos.OtroDocListarDto;
 import com.unicauca.maestria.api.gestionasignaturasms.exceptions.FieldErrorException;
 import com.unicauca.maestria.api.gestionasignaturasms.exceptions.FieldUniqueException;
 import com.unicauca.maestria.api.gestionasignaturasms.exceptions.ResourceNotFoundException;
 import com.unicauca.maestria.api.gestionasignaturasms.mappers.AsignaturaCrearMapper;
 import com.unicauca.maestria.api.gestionasignaturasms.mappers.AsignaturaListarMapper;
+import com.unicauca.maestria.api.gestionasignaturasms.mappers.archivos.OficioListarMapper;
+import com.unicauca.maestria.api.gestionasignaturasms.mappers.archivos.OtroDocListarMapper;
 import com.unicauca.maestria.api.gestionasignaturasms.repositories.AsignaturaRepository;
 import com.unicauca.maestria.api.gestionasignaturasms.repositories.DocenteAsignaturaRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -35,6 +40,9 @@ public class AsignaturaServiceImpl implements AsignaturaService {
     private final AsignaturaCrearMapper asignaturaCrearMapper;
     private final AsignaturaListarMapper asignaturaListarMapper;
     private final InformacionUnicaAsignatura informacionUnicaAsignatura;
+    private final OficioListarMapper oficioListarMapper;
+    private final OtroDocListarMapper otroDocListarMapper;
+    private final ArchivoClient archivoClient;
 
     @Override
     public AsignaturaListarDto crear(AsignaturaCrearDto asignatura, BindingResult result) {
@@ -44,13 +52,50 @@ public class AsignaturaServiceImpl implements AsignaturaService {
         CamposUnicosDto camposUnicos = informacionUnicaAsignatura.apply(asignatura);
 
         Map<String, String> validacionCamposUnicos = validacionCampoUnicos(camposUnicos, null);
+        System.out.println(validacionCamposUnicos);
         if (!validacionCamposUnicos.isEmpty()) {
             throw new FieldUniqueException(validacionCamposUnicos);
         }
 
+        OficioListarDto oficioTmp = archivoClient.crearOficio(asignatura.getOficioFacultad());
+        asignatura.setOficioFacultad(null);
+        OtroDocListarDto contenidoTmp = archivoClient.crearOtroDoc(asignatura.getContenidoProgramatico());
+        asignatura.setContenidoProgramatico(null);
+        OtroDocListarDto microcurTmp = archivoClient.crearOtroDoc(asignatura.getMicrocurriculo());
+        asignatura.setMicrocurriculo(null);
         Asignatura asignaturaDb = asigRepository.save(asignaturaCrearMapper.toEntity(asignatura));
+        asignaturaDb.setOficioFacultad(oficioListarMapper.toEntity(oficioTmp));
+        asignaturaDb.setContenidoProgramatico(otroDocListarMapper.toEntity(contenidoTmp));
+        asignaturaDb.setMicrocurriculo(otroDocListarMapper.toEntity(microcurTmp));
 
-        return asignaturaListarMapper.toDto(asignaturaDb);
+        List<ActaAsignatura> actaAsignaturaList = new ArrayList<>();
+        ActaAsignatura actaAsignaturaTmp = null;
+        for (Acta actaTmp : asignatura.getListaActas()) {
+            actaAsignaturaTmp = new ActaAsignatura();
+            actaAsignaturaTmp.setActa(actaTmp);
+            actaAsignaturaTmp.setAsignatura(asignaturaDb);
+            actaAsignaturaList.add(actaAsignaturaTmp);
+        }
+
+        List<DocenteAsignatura> docenteAsignaturaList = new ArrayList<>();
+        DocenteAsignatura docenteAsignatura = null;
+        for (Docente docenteTmp : asignatura.getListaDocentes()) {
+            docenteAsignatura = new DocenteAsignatura();
+            docenteAsignatura.setDictaAsignatura(true);
+            docenteAsignatura.setDocente(docenteTmp);
+            docenteAsignatura.setAsignatura(asignaturaDb);
+            docenteAsignaturaList.add(docenteAsignatura);
+        }
+
+        asignaturaDb.setDocentesAsignaturas(docenteAsignaturaList);
+        asignaturaDb.setActasAsignaturas(actaAsignaturaList);
+        Asignatura asignaturaSave = asigRepository.save(asignaturaDb);
+        return asignaturaListarMapper.toDto(asignaturaSave);
+    }
+
+    @Override
+    public AsignaturaCrearDto buscarPorIdCompleto(Long id){
+        return asigRepository.findById(id).map(asignaturaCrearMapper::toDto).orElseThrow(() -> new ResourceNotFoundException("Asignatura con id: " + id + " No encontrada"));
     }
 
     @Override
@@ -78,22 +123,22 @@ public class AsignaturaServiceImpl implements AsignaturaService {
     }
 
     public void actualizarInformacionAsignatura(Asignatura asignatura,Asignatura asignaturaBD) {
-        asignaturaBD.setContenidoAsignatura(asignatura.getContenidoAsignatura());
         asignaturaBD.setCodigoAsignatura(asignatura.getCodigoAsignatura());
-        asignaturaBD.setEstadoAsignatura(asignatura.getEstadoAsignatura());
         asignaturaBD.setNombreAsignatura(asignatura.getNombreAsignatura());
-        asignaturaBD.setTipoAsignatura(asignatura.getTipoAsignatura());
-        asignaturaBD.setCreditos(asignatura.getCreditos());
-        asignaturaBD.setAreaFormacion(asignatura.getAreaFormacion());
-        asignaturaBD.setLineaInvestigacionAsignatura(asignatura.getLineaInvestigacionAsignatura());
+        asignaturaBD.setEstadoAsignatura(asignatura.getEstadoAsignatura());
         asignaturaBD.setFechaAprobacion(asignatura.getFechaAprobacion());
+        asignaturaBD.setOficioFacultad(asignatura.getOficioFacultad());
+        asignaturaBD.setAreaFormacion(asignatura.getAreaFormacion());
+        asignaturaBD.setTipoAsignatura(asignatura.getTipoAsignatura());
+        asignaturaBD.setLineaInvestigacionAsignatura(asignatura.getLineaInvestigacionAsignatura());
+        asignaturaBD.setCreditos(asignatura.getCreditos());
+        asignaturaBD.setObjetivoAsignatura(asignatura.getObjetivoAsignatura());
+        asignaturaBD.setContenidoAsignatura(asignatura.getContenidoAsignatura());
         asignaturaBD.setContenidoProgramatico(asignatura.getContenidoProgramatico());
+        asignaturaBD.setMicrocurriculo(asignatura.getMicrocurriculo());
         asignaturaBD.setHorasNoPresencial(asignatura.getHorasNoPresencial());
         asignaturaBD.setHorasPresencial(asignatura.getHorasPresencial());
         asignaturaBD.setHorasTotal(asignatura.getHorasTotal());
-        asignaturaBD.setMicrocurriculo(asignatura.getMicrocurriculo());
-        asignaturaBD.setOficioFacultad(asignatura.getOficioFacultad());
-        asignaturaBD.setObjetivoAsignatura(asignatura.getObjetivoAsignatura());
     }
 
 
@@ -113,8 +158,8 @@ public class AsignaturaServiceImpl implements AsignaturaService {
 
         Map<String, Function<CamposUnicosDto, Boolean>> map = new HashMap<>();
 
-        map.put("nombre", dto -> (camposUnicosBD == null || !dto.getNombreAsignatura().equals(camposUnicosBD.getNombreAsignatura())) && asigRepository.existsByNombreAsignatura(dto.getNombreAsignatura()));
-        map.put("codigo", dto -> (camposUnicosBD == null || !dto.getCodigoAsignatura().equals(camposUnicosBD.getCodigoAsignatura())) && asigRepository.existsByCodigoAsignatura(dto.getCodigoAsignatura()));
+        map.put("nombreAsignatura", dto -> (camposUnicosBD == null || !dto.getNombreAsignatura().equals(camposUnicosBD.getNombreAsignatura())) && asigRepository.existsByNombreAsignatura(dto.getNombreAsignatura()));
+        map.put("codigoAsignatura", dto -> (camposUnicosBD == null || !dto.getCodigoAsignatura().equals(camposUnicosBD.getCodigoAsignatura())) && asigRepository.existsByCodigoAsignatura(dto.getCodigoAsignatura()));
 
         Predicate<Field> existeCampo = campo -> map.containsKey(campo.getName());
         Predicate<Field> existeCampoBD = campoBD -> map.get(campoBD.getName()).apply(camposUnicos);
@@ -135,6 +180,6 @@ public class AsignaturaServiceImpl implements AsignaturaService {
     }
 
     private <T> String mensajeException(String nombreCampo, T valorCampo) {
-        return "Campo único, ya existe un docente con la información: " + nombreCampo + ": " + valorCampo;
+        return "Campo único, ya existe una Asignaaturaa con la información: " + nombreCampo + ": " + valorCampo;
     }
 }

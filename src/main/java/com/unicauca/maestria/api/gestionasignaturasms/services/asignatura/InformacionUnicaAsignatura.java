@@ -9,10 +9,10 @@ import java.util.function.Function;
 @Service
 public class InformacionUnicaAsignatura implements Function<AsignaturaCrearDto, CamposUnicosDto> {
 
-
     @Override
     public CamposUnicosDto apply(AsignaturaCrearDto asignaturaCrearDto) {
         return CamposUnicosDto.builder()
+                .codigoAsignatura(asignaturaCrearDto.getCodigoAsignatura())
                 .nombreAsignatura(asignaturaCrearDto.getNombreAsignatura())
                 .build();
     }

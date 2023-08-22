@@ -1,61 +1,47 @@
 package com.unicauca.maestria.api.gestionasignaturasms.domain.msestudiantedocente;
 
-import java.util.Objects;
-
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
 import com.unicauca.maestria.api.gestionasignaturasms.common.enums.msestudiantedocente.AbreviaturaTitulo;
 import com.unicauca.maestria.api.gestionasignaturasms.common.enums.msestudiantedocente.CategoriaMinCiencia;
+import lombok.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import javax.persistence.*;
+import java.util.Objects;
 
 @Setter @Getter @ToString @NoArgsConstructor @AllArgsConstructor
 @Entity @Table(name = "titulos")
 public class Titulo {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	
+	@ManyToOne
+	@JoinColumn(name = "id_docente")
+	private Docente docente;
+	
+	@Enumerated(EnumType.STRING)
+	private AbreviaturaTitulo abreviatura;
+	
+	@Enumerated(EnumType.STRING)
+	private CategoriaMinCiencia categoriaMinCiencia;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	private String universidad;
+	
+	private String linkCvLac;
 
-    @ManyToOne
-    @JoinColumn(name = "id_docente")
-    private Docente docente;
-
-    @Enumerated(EnumType.STRING)
-    private AbreviaturaTitulo abreviatura;
-
-    @Enumerated(EnumType.STRING)
-    private CategoriaMinCiencia categoriaMinCiencia;
-
-    private String universidad;
-
-    private String linkCvLac;
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Titulo other = (Titulo) obj;
-        return Objects.equals(id, other.id);
-    }
-
-
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Titulo other = (Titulo) obj;
+		return Objects.equals(id, other.id);
+	}
 
 
+	
+	
 }

@@ -2,21 +2,21 @@ package com.unicauca.maestria.api.gestionasignaturasms.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.unicauca.maestria.api.gestionasignaturasms.domain.msestudiantedocente.Docente;
+import com.unicauca.maestria.api.gestionasignaturasms.domain.archivos.Acta;
 import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name = "DOCENTE_ASIGNATURA", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"ID_DOCENTE", "ID_ASIGNATURA"})
+@Table(name = "ACTA_ASIGNATURA", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"ID_ACTA", "ID_ASIGNATURA"})
 })
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class DocenteAsignatura {
+public class ActaAsignatura {
 
     @Id
     @Column(name = "ID")
@@ -24,17 +24,14 @@ public class DocenteAsignatura {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "ID_DOCENTE")
-//    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+    @JoinColumn(name = "ID_ACTA")
     @JsonBackReference
-    private Docente docente;
+    private Acta acta;
 
     @ManyToOne
     @JoinColumn(name = "ID_ASIGNATURA")
-//    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "docentesAsignaturas" })
+//    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "actasAsignaturas" })
     @JsonBackReference
     private Asignatura asignatura;
 
-    @Column(name = "DICTA_ASIGNATURA")
-    private Boolean dictaAsignatura;
 }

@@ -1,11 +1,13 @@
 package com.unicauca.maestria.api.gestionasignaturasms.domain;
 
-import com.unicauca.maestria.api.gestionasignaturasms.domain.msestudiantedocente.Docente;
+import com.unicauca.maestria.api.gestionasignaturasms.domain.archivos.Oficio;
+import com.unicauca.maestria.api.gestionasignaturasms.domain.archivos.OtroDoc;
 import com.unicauca.maestria.api.gestionasignaturasms.domain.msestudiantedocente.LineaInvestigacion;
 import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "asignaturas")
@@ -33,8 +35,9 @@ public class Asignatura {
     @Column(name = "fecha_aprobacion")
     private Date fechaAprobacion;
 
-    @Column(name = "oficio_facultad")
-    private String oficioFacultad;//archivo oficio
+    @JoinColumn(name = "oficio_facultad")
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Oficio oficioFacultad;//archivo oficio
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "area_formacion")
@@ -56,11 +59,13 @@ public class Asignatura {
     @Column(name = "contenido_asignatura")
     private String contenidoAsignatura;
 
-    @Column(name = "contenido_programatico")
-    private String contenidoProgramatico;//aarchivo pdf
+    @JoinColumn(name = "contenido_programatico")
+    @ManyToOne(cascade = CascadeType.ALL)
+    private OtroDoc contenidoProgramatico;//aarchivo pdf
 
-    @Column(name = "microcurriculo")
-    private String microcurriculo;//archivo pdf
+    @JoinColumn(name = "microcurriculo")
+    @ManyToOne(cascade = CascadeType.ALL)
+    private OtroDoc microcurriculo;//archivo pdf
 
     @Column(name = "horas_presencial")
     private Integer horasPresencial;
@@ -70,4 +75,10 @@ public class Asignatura {
 
     @Column(name = "horas_total")
     private Integer horasTotal;
+
+    @OneToMany(mappedBy = "asignatura", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<DocenteAsignatura> docentesAsignaturas;
+
+    @OneToMany(mappedBy = "asignatura", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ActaAsignatura> actasAsignaturas;
 }

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
+import javax.validation.ConstraintViolationException;
+
 @ControllerAdvice
 public class GlobalHandlerException {
 
@@ -24,6 +26,19 @@ public class GlobalHandlerException {
                 .build();
 
         return new ResponseEntity<Object>(exc, estado);
+    }
+
+    @ExceptionHandler(value = ConstraintViolationException.class)
+    public ResponseEntity<Object> handleValidationException(ConstraintViolationException ex) {
+        Map<String, Object> errors = new HashMap<>();
+
+        ex.getConstraintViolations().forEach(violation -> {
+            String attributeName = violation.getPropertyPath().toString();
+            String fieldName = attributeName.substring(attributeName.lastIndexOf('.') + 1);
+            errors.put(fieldName, "El campo: " + fieldName + ", " + violation.getMessage());
+        });
+
+        return ResponseEntity.badRequest().body(errors);
     }
 
     @ExceptionHandler(value = {FieldErrorException.class})

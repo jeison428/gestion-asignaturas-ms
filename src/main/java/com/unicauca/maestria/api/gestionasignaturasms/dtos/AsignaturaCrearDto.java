@@ -1,17 +1,24 @@
 package com.unicauca.maestria.api.gestionasignaturasms.dtos;
 
 import com.unicauca.maestria.api.gestionasignaturasms.common.enums.msestudiantedocente.TipoAsignatura;
+import com.unicauca.maestria.api.gestionasignaturasms.domain.ActaAsignatura;
 import com.unicauca.maestria.api.gestionasignaturasms.domain.AreaFormacion;
+import com.unicauca.maestria.api.gestionasignaturasms.domain.DocenteAsignatura;
+import com.unicauca.maestria.api.gestionasignaturasms.domain.archivos.Acta;
+import com.unicauca.maestria.api.gestionasignaturasms.domain.msestudiantedocente.Docente;
 import com.unicauca.maestria.api.gestionasignaturasms.domain.msestudiantedocente.LineaInvestigacion;
+import com.unicauca.maestria.api.gestionasignaturasms.dtos.archivos.OficioCrearDto;
+import com.unicauca.maestria.api.gestionasignaturasms.dtos.archivos.OtroDocCrearDto;
 import lombok.*;
 
-import javax.persistence.Column;
+import javax.persistence.Transient;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -35,8 +42,8 @@ public class AsignaturaCrearDto {
     private Date fechaAprobacion;
 
     @NotNull
-    @Size(min = 1)
-    private String oficioFacultad;//archivo oficio
+    @Transient
+    private OficioCrearDto oficioFacultad;//archivo oficio
 
     @NotNull
     @Valid
@@ -55,19 +62,17 @@ public class AsignaturaCrearDto {
 
     @NotNull
     @Size(min = 1)
-    private String objetivoAsignaturaa;
+    private String objetivoAsignatura;
 
     @NotNull
     @Size(min = 1)
     private String contenidoAsignatura;
 
     @NotNull
-    @Size(min = 1)
-    private String contenidoProgramatico;//aarchivo pdf
+    private OtroDocCrearDto contenidoProgramatico;//aarchivo pdf
 
     @NotNull
-    @Size(min = 1)
-    private String microcurriculo;//archivo pdf
+    private OtroDocCrearDto microcurriculo;//archivo pdf
 
     @NotNull
     @PositiveOrZero
@@ -80,4 +85,12 @@ public class AsignaturaCrearDto {
     @NotNull
     @Positive
     private Integer horasTotal;
+
+    private List<Docente> listaDocentes;
+
+    private List<Acta> listaActas;
+
+    private List<DocenteAsignatura> docentesAsignaturas;
+
+    private List<ActaAsignatura> actasAsignaturas;
 }
