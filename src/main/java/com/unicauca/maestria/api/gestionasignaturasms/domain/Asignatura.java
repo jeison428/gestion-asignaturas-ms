@@ -1,7 +1,9 @@
 package com.unicauca.maestria.api.gestionasignaturasms.domain;
 
+import com.unicauca.maestria.api.gestionasignaturasms.domain.archivos.Acta;
 import com.unicauca.maestria.api.gestionasignaturasms.domain.archivos.Oficio;
 import com.unicauca.maestria.api.gestionasignaturasms.domain.archivos.OtroDoc;
+import com.unicauca.maestria.api.gestionasignaturasms.domain.msestudiantedocente.Docente;
 import com.unicauca.maestria.api.gestionasignaturasms.domain.msestudiantedocente.LineaInvestigacion;
 import lombok.*;
 
@@ -75,6 +77,12 @@ public class Asignatura {
 
     @Column(name = "horas_total")
     private Integer horasTotal;
+
+    @Transient
+    private List<Docente> listaDocentes;
+
+    @Transient
+    private List<Acta> listaActas;
 
     @OneToMany(mappedBy = "asignatura", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<DocenteAsignatura> docentesAsignaturas;

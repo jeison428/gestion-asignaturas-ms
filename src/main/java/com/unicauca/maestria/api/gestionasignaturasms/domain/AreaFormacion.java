@@ -1,6 +1,7 @@
 package com.unicauca.maestria.api.gestionasignaturasms.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import javax.persistence.*;
@@ -26,7 +27,7 @@ public class AreaFormacion {
     @Column(name = "DESCRIPCION")
     private String descripcion;
 
-    @OneToMany(mappedBy = "areaFormacion", fetch = FetchType.LAZY)
-    @JsonBackReference
-    private List<Asignatura> asignaturas;
+//    @OneToMany(mappedBy = "areaFormacion", fetch = FetchType.LAZY)
+//    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "areaFormacion" })
+//    private List<Asignatura> asignaturas;
 }

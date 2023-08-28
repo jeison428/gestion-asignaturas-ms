@@ -10,13 +10,13 @@ import java.util.List;
 
 public interface AsignaturaService {
 
-    public AsignaturaListarDto crear(AsignaturaCrearDto asignatura, BindingResult result) throws JsonProcessingException;
+    public AsignaturaListarDto crear(AsignaturaCrearDto asignatura, BindingResult result);
 
     public AsignaturaListarDto editar(Long id, AsignaturaCrearDto asignatura, BindingResult result);
 
     public AsignaturaListarDto buscarPorId(Long id);
 
-    public AsignaturaCrearDto buscarPorIdCompleto(Long id);
+    public Asignatura buscarPorIdCompleto(Long id);
 
     public List<AsignaturaListarDto> buscarTodo();
 

@@ -1,5 +1,6 @@
 package com.unicauca.maestria.api.gestionasignaturasms.dtos;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.unicauca.maestria.api.gestionasignaturasms.common.enums.msestudiantedocente.TipoAsignatura;
 import com.unicauca.maestria.api.gestionasignaturasms.domain.ActaAsignatura;
 import com.unicauca.maestria.api.gestionasignaturasms.domain.AreaFormacion;

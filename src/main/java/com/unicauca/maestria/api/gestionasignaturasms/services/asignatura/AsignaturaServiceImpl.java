@@ -68,24 +68,8 @@ public class AsignaturaServiceImpl implements AsignaturaService {
         asignaturaDb.setContenidoProgramatico(otroDocListarMapper.toEntity(contenidoTmp));
         asignaturaDb.setMicrocurriculo(otroDocListarMapper.toEntity(microcurTmp));
 
-        List<ActaAsignatura> actaAsignaturaList = new ArrayList<>();
-        ActaAsignatura actaAsignaturaTmp = null;
-        for (Acta actaTmp : asignatura.getListaActas()) {
-            actaAsignaturaTmp = new ActaAsignatura();
-            actaAsignaturaTmp.setActa(actaTmp);
-            actaAsignaturaTmp.setAsignatura(asignaturaDb);
-            actaAsignaturaList.add(actaAsignaturaTmp);
-        }
-
-        List<DocenteAsignatura> docenteAsignaturaList = new ArrayList<>();
-        DocenteAsignatura docenteAsignatura = null;
-        for (Docente docenteTmp : asignatura.getListaDocentes()) {
-            docenteAsignatura = new DocenteAsignatura();
-            docenteAsignatura.setDictaAsignatura(true);
-            docenteAsignatura.setDocente(docenteTmp);
-            docenteAsignatura.setAsignatura(asignaturaDb);
-            docenteAsignaturaList.add(docenteAsignatura);
-        }
+        List<ActaAsignatura> actaAsignaturaList = asignarActasAsignaturas(asignatura.getListaActas(), asignaturaDb);
+        List<DocenteAsignatura> docenteAsignaturaList = asignarDocentesAsignaturas(asignatura.getListaDocentes(), asignaturaDb);
 
         asignaturaDb.setDocentesAsignaturas(docenteAsignaturaList);
         asignaturaDb.setActasAsignaturas(actaAsignaturaList);
@@ -93,9 +77,34 @@ public class AsignaturaServiceImpl implements AsignaturaService {
         return asignaturaListarMapper.toDto(asignaturaSave);
     }
 
+    private List<DocenteAsignatura> asignarDocentesAsignaturas(List<Docente> docentes, Asignatura asignatura){
+        List<DocenteAsignatura> docenteAsignaturaList = new ArrayList<>();
+        DocenteAsignatura docenteAsignatura = null;
+        for (Docente docenteTmp : docentes) {
+            docenteAsignatura = new DocenteAsignatura();
+            docenteAsignatura.setDictaAsignatura(true);
+            docenteAsignatura.setDocente(docenteTmp);
+            docenteAsignatura.setAsignatura(asignatura);
+            docenteAsignaturaList.add(docenteAsignatura);
+        }
+        return docenteAsignaturaList;
+    }
+
+    private List<ActaAsignatura> asignarActasAsignaturas(List<Acta> actas, Asignatura asignatura) {
+        List<ActaAsignatura> actaAsignaturaList = new ArrayList<>();
+        ActaAsignatura actaAsignaturaTmp = null;
+        for (Acta actaTmp : actas) {
+            actaAsignaturaTmp = new ActaAsignatura();
+            actaAsignaturaTmp.setActa(actaTmp);
+            actaAsignaturaTmp.setAsignatura(asignatura);
+            actaAsignaturaList.add(actaAsignaturaTmp);
+        }
+        return actaAsignaturaList;
+    }
+
     @Override
-    public AsignaturaCrearDto buscarPorIdCompleto(Long id){
-        return asigRepository.findById(id).map(asignaturaCrearMapper::toDto).orElseThrow(() -> new ResourceNotFoundException("Asignatura con id: " + id + " No encontrada"));
+    public Asignatura buscarPorIdCompleto(Long id){
+        return asigRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Asignatura con id: " + id + " No encontrada"));
     }
 
     @Override
@@ -115,10 +124,29 @@ public class AsignaturaServiceImpl implements AsignaturaService {
         if(!validacionCamposUnicos.isEmpty()) {
             throw new FieldUniqueException(validacionCamposUnicos);
         }
-
-
         actualizarInformacionAsignatura(asignaturaTmp, asignaturaBD);
-        Asignatura save = asigRepository.save(asignaturaBD);
+
+        List<ActaAsignatura> actaAsignaturaList = null;
+        if (asignatura.getListaActas() != null && !asignatura.getListaActas().isEmpty()){
+            actaAsignaturaList = asignarActasAsignaturas(asignatura.getListaActas(), asignaturaBD);
+            if (asignaturaBD.getActasAsignaturas() != null){
+                asignaturaBD.getActasAsignaturas().addAll(actaAsignaturaList);
+            }
+//            asignaturaBD.setActasAsignaturas(actaAsignaturaList);
+        }
+
+        List<DocenteAsignatura> docenteAsignaturaList = null;
+        if (asignatura.getListaDocentes() != null && !asignatura.getListaDocentes().isEmpty()){
+            docenteAsignaturaList = asignarDocentesAsignaturas(asignatura.getListaDocentes(), asignaturaBD);
+            if (asignaturaBD.getDocentesAsignaturas() != null){
+                asignaturaBD.getDocentesAsignaturas().addAll(docenteAsignaturaList);
+            }
+//            asignaturaBD.setDocentesAsignaturas(docenteAsignaturaList);
+        }
+
+        Asignatura asignaturaSave = asigRepository.save(asignaturaBD);
+
+        Asignatura save = asigRepository.save(asignaturaSave);
         return asignaturaListarMapper.toDto(save);
     }
 
@@ -139,6 +167,8 @@ public class AsignaturaServiceImpl implements AsignaturaService {
         asignaturaBD.setHorasNoPresencial(asignatura.getHorasNoPresencial());
         asignaturaBD.setHorasPresencial(asignatura.getHorasPresencial());
         asignaturaBD.setHorasTotal(asignatura.getHorasTotal());
+        asignaturaBD.setDocentesAsignaturas(asignatura.getDocentesAsignaturas());
+        asignaturaBD.setActasAsignaturas(asignatura.getActasAsignaturas());
     }
 
 

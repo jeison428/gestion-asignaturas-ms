@@ -25,13 +25,13 @@ public class ActaAsignatura {
 
     @ManyToOne
     @JoinColumn(name = "ID_ACTA")
-    @JsonBackReference
+//    @JsonBackReference
     private Acta acta;
 
     @ManyToOne
     @JoinColumn(name = "ID_ASIGNATURA")
-//    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "actasAsignaturas" })
-    @JsonBackReference
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "actasAsignaturas" })
+//    @JsonBackReference
     private Asignatura asignatura;
 
 }

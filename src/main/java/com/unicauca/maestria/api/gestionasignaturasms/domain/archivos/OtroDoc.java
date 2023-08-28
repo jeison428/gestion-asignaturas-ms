@@ -1,6 +1,7 @@
 package com.unicauca.maestria.api.gestionasignaturasms.domain.archivos;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.unicauca.maestria.api.gestionasignaturasms.domain.Asignatura;
 import lombok.*;
 
@@ -36,11 +37,13 @@ public class OtroDoc {
     private String descripcionDocumento;
 
     @OneToMany(mappedBy = "contenidoProgramatico", cascade = CascadeType.ALL)
-    @JsonBackReference
+//    @JsonBackReference
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "contenidoProgramatico" })
     private List<Asignatura> asignaturasContenidoProgramatico;
 
     @OneToMany(mappedBy = "microcurriculo", cascade = CascadeType.ALL)
-    @JsonBackReference
+//    @JsonBackReference
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "microcurriculo" })
     private List<Asignatura> asignaturasMicrocurriculo;
 
 }

@@ -7,6 +7,7 @@ import com.unicauca.maestria.api.gestionasignaturasms.dtos.AsignaturaListarDto;
 import com.unicauca.maestria.api.gestionasignaturasms.services.asignatura.AsignaturaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +22,8 @@ public class AsignaturaController {
 
     private final AsignaturaService service;
 
-    @PostMapping
-    public ResponseEntity<AsignaturaListarDto> crear(@Valid @RequestBody AsignaturaCrearDto asignatura, BindingResult result) throws JsonProcessingException {
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AsignaturaListarDto> crear(@Valid @RequestBody AsignaturaCrearDto asignatura, BindingResult result) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.crear(asignatura, result));
     }
 
@@ -37,7 +38,7 @@ public class AsignaturaController {
     }
 
     @GetMapping("/completa/{id}")
-    public ResponseEntity<AsignaturaCrearDto> buscarPorIdCompleta(@PathVariable Long id){
+    public ResponseEntity<Asignatura> buscarPorIdCompleta(@PathVariable Long id){
         return ResponseEntity.status(HttpStatus.OK).body(service.buscarPorIdCompleto(id));
     }
 

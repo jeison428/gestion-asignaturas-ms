@@ -1,6 +1,7 @@
 package com.unicauca.maestria.api.gestionasignaturasms.domain.archivos;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.unicauca.maestria.api.gestionasignaturasms.domain.Asignatura;
 import lombok.*;
 
@@ -35,6 +36,7 @@ public class Oficio {
     private String asuntoOfi;
 
     @OneToMany(mappedBy = "oficioFacultad", cascade = CascadeType.ALL)
-    @JsonBackReference
+//    @JsonBackReference
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "oficioFacultad" })
     private List<Asignatura> asignaturas;
 }
