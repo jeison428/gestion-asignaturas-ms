@@ -21,7 +21,6 @@ public class OtroDocCrearDto {
     private DocumentoMaestria idDocMaestria;
 
     @NotNull
-//    @Size(min = 10)
     private String nombreDocumento;
 
     @NotNull
@@ -29,6 +28,5 @@ public class OtroDocCrearDto {
     private Long versionDoc;
 
     @NotNull
-//    @Size(min = 10)
     private String descripcionDocumento;
 }

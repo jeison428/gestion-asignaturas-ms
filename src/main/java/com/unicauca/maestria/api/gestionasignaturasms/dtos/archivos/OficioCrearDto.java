@@ -32,6 +32,5 @@ public class OficioCrearDto {
     private Date fechaOficio;
 
     @NotNull
-    @Size(min = 1)
     private String asuntoOfi;
 }

@@ -20,4 +20,10 @@ public interface AsignaturaService {
 
     public List<AsignaturaListarDto> buscarTodo();
 
+    public boolean existNombre(String nombre);
+
+    public boolean existCodigo(Long codigo);
+
+    public List<AsignaturaListarDto> buscarTodoPorEstado(Boolean estado);
+
 }

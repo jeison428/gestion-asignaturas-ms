@@ -16,7 +16,9 @@ import com.unicauca.maestria.api.gestionasignaturasms.exceptions.FieldUniqueExce
 import com.unicauca.maestria.api.gestionasignaturasms.exceptions.ResourceNotFoundException;
 import com.unicauca.maestria.api.gestionasignaturasms.mappers.AsignaturaCrearMapper;
 import com.unicauca.maestria.api.gestionasignaturasms.mappers.AsignaturaListarMapper;
+import com.unicauca.maestria.api.gestionasignaturasms.mappers.archivos.OficioCrearMapper;
 import com.unicauca.maestria.api.gestionasignaturasms.mappers.archivos.OficioListarMapper;
+import com.unicauca.maestria.api.gestionasignaturasms.mappers.archivos.OtroDocCrearMapper;
 import com.unicauca.maestria.api.gestionasignaturasms.mappers.archivos.OtroDocListarMapper;
 import com.unicauca.maestria.api.gestionasignaturasms.repositories.AsignaturaRepository;
 import com.unicauca.maestria.api.gestionasignaturasms.repositories.DocenteAsignaturaRepository;
@@ -41,7 +43,9 @@ public class AsignaturaServiceImpl implements AsignaturaService {
     private final AsignaturaListarMapper asignaturaListarMapper;
     private final InformacionUnicaAsignatura informacionUnicaAsignatura;
     private final OficioListarMapper oficioListarMapper;
+    private final OficioCrearMapper oficioCrearMapper;
     private final OtroDocListarMapper otroDocListarMapper;
+    private final OtroDocCrearMapper otroDocCrearMapper;
     private final ArchivoClient archivoClient;
 
     @Override
@@ -151,19 +155,32 @@ public class AsignaturaServiceImpl implements AsignaturaService {
     }
 
     public void actualizarInformacionAsignatura(Asignatura asignatura,Asignatura asignaturaBD) {
-        asignaturaBD.setCodigoAsignatura(asignatura.getCodigoAsignatura());
+        if (asignatura.getOficioFacultad().getIdDocMaestria().getLinkDocumento().compareToIgnoreCase(asignaturaBD.getOficioFacultad().getIdDocMaestria().getLinkDocumento()) != 0){
+            OficioListarDto oficioTmp = archivoClient.crearOficio(oficioCrearMapper.toDto(asignatura.getOficioFacultad()));
+            asignatura.setOficioFacultad(null);
+            asignaturaBD.setOficioFacultad(oficioListarMapper.toEntity(oficioTmp));
+        }
+        if (asignatura.getContenidoProgramatico().getIdDocMaestria().getLinkDocumento().compareToIgnoreCase(asignaturaBD.getContenidoProgramatico().getIdDocMaestria().getLinkDocumento()) != 0){
+            OtroDocListarDto contenidoTmp = archivoClient.crearOtroDoc(otroDocCrearMapper.toDto(asignatura.getContenidoProgramatico()));
+            asignatura.setContenidoProgramatico(null);
+            asignaturaBD.setContenidoProgramatico(otroDocListarMapper.toEntity(contenidoTmp));
+        }
+
+        if (asignatura.getMicrocurriculo().getIdDocMaestria().getLinkDocumento().compareToIgnoreCase(asignaturaBD.getMicrocurriculo().getIdDocMaestria().getLinkDocumento()) != 0){
+            OtroDocListarDto microcurTmp = archivoClient.crearOtroDoc(otroDocCrearMapper.toDto(asignatura.getMicrocurriculo()));
+            asignatura.setMicrocurriculo(null);
+            asignaturaBD.setMicrocurriculo(otroDocListarMapper.toEntity(microcurTmp));
+        }
+
         asignaturaBD.setNombreAsignatura(asignatura.getNombreAsignatura());
         asignaturaBD.setEstadoAsignatura(asignatura.getEstadoAsignatura());
         asignaturaBD.setFechaAprobacion(asignatura.getFechaAprobacion());
-        asignaturaBD.setOficioFacultad(asignatura.getOficioFacultad());
         asignaturaBD.setAreaFormacion(asignatura.getAreaFormacion());
         asignaturaBD.setTipoAsignatura(asignatura.getTipoAsignatura());
         asignaturaBD.setLineaInvestigacionAsignatura(asignatura.getLineaInvestigacionAsignatura());
         asignaturaBD.setCreditos(asignatura.getCreditos());
         asignaturaBD.setObjetivoAsignatura(asignatura.getObjetivoAsignatura());
         asignaturaBD.setContenidoAsignatura(asignatura.getContenidoAsignatura());
-        asignaturaBD.setContenidoProgramatico(asignatura.getContenidoProgramatico());
-        asignaturaBD.setMicrocurriculo(asignatura.getMicrocurriculo());
         asignaturaBD.setHorasNoPresencial(asignatura.getHorasNoPresencial());
         asignaturaBD.setHorasPresencial(asignatura.getHorasPresencial());
         asignaturaBD.setHorasTotal(asignatura.getHorasTotal());
@@ -182,6 +199,21 @@ public class AsignaturaServiceImpl implements AsignaturaService {
     @Transactional(readOnly = true)
     public List<AsignaturaListarDto> buscarTodo() {
         return asignaturaListarMapper.toDtoList(this.asigRepository.findAll());
+    }
+
+    @Override
+    public boolean existNombre(String nombre) {
+        return existNombre(nombre);
+    }
+
+    @Override
+    public boolean existCodigo(Long codigo) {
+        return existCodigo(codigo);
+    }
+
+    @Override
+    public List<AsignaturaListarDto> buscarTodoPorEstado(Boolean estado) {
+        return asignaturaListarMapper.toDtoList(this.asigRepository.findByEstado(estado));
     }
 
     private Map<String, String> validacionCampoUnicos(CamposUnicosDto camposUnicos, CamposUnicosDto camposUnicosBD) {

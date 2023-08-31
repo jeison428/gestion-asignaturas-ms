@@ -32,9 +32,24 @@ public class AsignaturaController {
         return ResponseEntity.status(HttpStatus.OK).body(service.buscarTodo());
     }
 
+    @GetMapping("/estado/{estado}")
+    public ResponseEntity<List<AsignaturaListarDto>> listarTodoPorEstado(@PathVariable Boolean estado){
+        return ResponseEntity.status(HttpStatus.OK).body(service.buscarTodoPorEstado(estado));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<AsignaturaListarDto> buscarPorId(@PathVariable Long id){
         return ResponseEntity.status(HttpStatus.OK).body(service.buscarPorId(id));
+    }
+
+    @GetMapping("/codigo/{codigo}")
+    public ResponseEntity<Boolean> existCodigo(@PathVariable Long codigo){
+        return ResponseEntity.status(HttpStatus.OK).body(service.existCodigo(codigo));
+    }
+
+    @GetMapping("/estado/{estado}")
+    public ResponseEntity<Boolean> existNombre(@PathVariable String nombre){
+        return ResponseEntity.status(HttpStatus.OK).body(service.existNombre(nombre));
     }
 
     @GetMapping("/completa/{id}")

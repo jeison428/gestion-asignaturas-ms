@@ -15,10 +15,6 @@ public class Titulo {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@ManyToOne
-	@JoinColumn(name = "id_docente")
-	private Docente docente;
-	
 	@Enumerated(EnumType.STRING)
 	private AbreviaturaTitulo abreviatura;
 	

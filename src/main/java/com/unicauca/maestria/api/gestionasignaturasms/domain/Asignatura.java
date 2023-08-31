@@ -1,5 +1,6 @@
 package com.unicauca.maestria.api.gestionasignaturasms.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.unicauca.maestria.api.gestionasignaturasms.domain.archivos.Acta;
 import com.unicauca.maestria.api.gestionasignaturasms.domain.archivos.Oficio;
 import com.unicauca.maestria.api.gestionasignaturasms.domain.archivos.OtroDoc;
@@ -85,8 +86,10 @@ public class Asignatura {
     private List<Acta> listaActas;
 
     @OneToMany(mappedBy = "asignatura", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "asignatura" })
     private List<DocenteAsignatura> docentesAsignaturas;
 
     @OneToMany(mappedBy = "asignatura", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "asignatura" })
     private List<ActaAsignatura> actasAsignaturas;
 }

@@ -50,7 +50,6 @@ public class AsignaturaCrearDto {
     @Valid
     private AreaFormacion areaFormacion;
 
-    @NotNull
     @Valid
     private LineaInvestigacion lineaInvestigacionAsignatura;
 

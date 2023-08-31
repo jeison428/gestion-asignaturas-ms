@@ -14,6 +14,5 @@ import javax.validation.constraints.Size;
 public class DocumentoMaestriaCrearaDto {
 
     @NotNull
-    @Size(min = 5)
     private String linkDocumento;
 }

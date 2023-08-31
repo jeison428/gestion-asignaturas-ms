@@ -35,8 +35,8 @@ public class Oficio {
     @Column(name = "ASUNTOOFI")
     private String asuntoOfi;
 
-    @OneToMany(mappedBy = "oficioFacultad", cascade = CascadeType.ALL)
-//    @JsonBackReference
-    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "oficioFacultad" })
-    private List<Asignatura> asignaturas;
+//    @OneToMany(mappedBy = "oficioFacultad", cascade = CascadeType.ALL)
+////    @JsonBackReference
+//    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "oficioFacultad" })
+//    private List<Asignatura> asignaturas;
 }
