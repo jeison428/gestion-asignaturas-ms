@@ -48,7 +48,7 @@ public class AsignaturaController {
         return ResponseEntity.status(HttpStatus.OK).body(service.existCodigo(codigo));
     }
 
-    @GetMapping("/estado/{estado}")
+    @GetMapping("/nombre/{nombre}")
     public ResponseEntity<Boolean> existNombre(@PathVariable String nombre){
         return ResponseEntity.status(HttpStatus.OK).body(service.existNombre(nombre));
     }

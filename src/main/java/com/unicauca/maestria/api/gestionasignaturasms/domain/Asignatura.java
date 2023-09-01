@@ -1,6 +1,7 @@
 package com.unicauca.maestria.api.gestionasignaturasms.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.unicauca.maestria.api.gestionasignaturasms.common.enums.msestudiantedocente.TipoAsignatura;
 import com.unicauca.maestria.api.gestionasignaturasms.domain.archivos.Acta;
 import com.unicauca.maestria.api.gestionasignaturasms.domain.archivos.Oficio;
 import com.unicauca.maestria.api.gestionasignaturasms.domain.archivos.OtroDoc;
@@ -11,6 +12,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "asignaturas")
@@ -47,7 +49,8 @@ public class Asignatura {
     private AreaFormacion areaFormacion;
 
     @Column(name = "tipo_asignatura")
-    private String tipoAsignatura;
+    @Enumerated(EnumType.STRING)
+    private TipoAsignatura tipoAsignatura;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "linea_investigacion")
@@ -92,4 +95,12 @@ public class Asignatura {
     @OneToMany(mappedBy = "asignatura", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "asignatura" })
     private List<ActaAsignatura> actasAsignaturas;
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Asignatura asignatura = (Asignatura) o;
+        return codigoAsignatura == asignatura.codigoAsignatura &&
+                Objects.equals(nombreAsignatura, asignatura.nombreAsignatura);
+    }
 }

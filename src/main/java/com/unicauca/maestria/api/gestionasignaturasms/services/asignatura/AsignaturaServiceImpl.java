@@ -117,7 +117,6 @@ public class AsignaturaServiceImpl implements AsignaturaService {
             throw new FieldErrorException(result);
         }
 
-        Asignatura asignaturaTmp = asignaturaCrearMapper.toEntity(asignatura);
         Asignatura asignaturaBD = asigRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Asignatura con id: "+id+" No encontrada"));
 
@@ -128,7 +127,7 @@ public class AsignaturaServiceImpl implements AsignaturaService {
         if(!validacionCamposUnicos.isEmpty()) {
             throw new FieldUniqueException(validacionCamposUnicos);
         }
-        actualizarInformacionAsignatura(asignaturaTmp, asignaturaBD);
+        actualizarInformacionAsignatura(asignatura, asignaturaBD);
 
         List<ActaAsignatura> actaAsignaturaList = null;
         if (asignatura.getListaActas() != null && !asignatura.getListaActas().isEmpty()){
@@ -150,24 +149,24 @@ public class AsignaturaServiceImpl implements AsignaturaService {
 
         Asignatura asignaturaSave = asigRepository.save(asignaturaBD);
 
-        Asignatura save = asigRepository.save(asignaturaSave);
-        return asignaturaListarMapper.toDto(save);
+//        Asignatura save = asigRepository.save(asignaturaSave);
+        return asignaturaListarMapper.toDto(asignaturaSave);
     }
 
-    public void actualizarInformacionAsignatura(Asignatura asignatura,Asignatura asignaturaBD) {
+    public void actualizarInformacionAsignatura(AsignaturaCrearDto asignatura,Asignatura asignaturaBD) {
         if (asignatura.getOficioFacultad().getIdDocMaestria().getLinkDocumento().compareToIgnoreCase(asignaturaBD.getOficioFacultad().getIdDocMaestria().getLinkDocumento()) != 0){
-            OficioListarDto oficioTmp = archivoClient.crearOficio(oficioCrearMapper.toDto(asignatura.getOficioFacultad()));
+            OficioListarDto oficioTmp = archivoClient.crearOficio(asignatura.getOficioFacultad());
             asignatura.setOficioFacultad(null);
             asignaturaBD.setOficioFacultad(oficioListarMapper.toEntity(oficioTmp));
         }
         if (asignatura.getContenidoProgramatico().getIdDocMaestria().getLinkDocumento().compareToIgnoreCase(asignaturaBD.getContenidoProgramatico().getIdDocMaestria().getLinkDocumento()) != 0){
-            OtroDocListarDto contenidoTmp = archivoClient.crearOtroDoc(otroDocCrearMapper.toDto(asignatura.getContenidoProgramatico()));
+            OtroDocListarDto contenidoTmp = archivoClient.crearOtroDoc(asignatura.getContenidoProgramatico());
             asignatura.setContenidoProgramatico(null);
             asignaturaBD.setContenidoProgramatico(otroDocListarMapper.toEntity(contenidoTmp));
         }
 
         if (asignatura.getMicrocurriculo().getIdDocMaestria().getLinkDocumento().compareToIgnoreCase(asignaturaBD.getMicrocurriculo().getIdDocMaestria().getLinkDocumento()) != 0){
-            OtroDocListarDto microcurTmp = archivoClient.crearOtroDoc(otroDocCrearMapper.toDto(asignatura.getMicrocurriculo()));
+            OtroDocListarDto microcurTmp = archivoClient.crearOtroDoc(asignatura.getMicrocurriculo());
             asignatura.setMicrocurriculo(null);
             asignaturaBD.setMicrocurriculo(otroDocListarMapper.toEntity(microcurTmp));
         }
@@ -184,10 +183,20 @@ public class AsignaturaServiceImpl implements AsignaturaService {
         asignaturaBD.setHorasNoPresencial(asignatura.getHorasNoPresencial());
         asignaturaBD.setHorasPresencial(asignatura.getHorasPresencial());
         asignaturaBD.setHorasTotal(asignatura.getHorasTotal());
+        if (Arrays.deepEquals(new List[]{asignaturaBD.getDocentesAsignaturas()}, new List[]{asignatura.getDocentesAsignaturas()})){
+            System.out.println("Entro al if");
+        }
         asignaturaBD.setDocentesAsignaturas(asignatura.getDocentesAsignaturas());
         asignaturaBD.setActasAsignaturas(asignatura.getActasAsignaturas());
     }
 
+    private List<DocenteAsignatura> validateDocentesAsignaturas(List<DocenteAsignatura> listaBody, List<DocenteAsignatura> listaDB){
+        List<DocenteAsignatura> response = new ArrayList<>();
+        for (DocenteAsignatura docAsig: listaDB){
+
+        }
+        return response;
+    }
 
     @Override
     @Transactional(readOnly = true)
