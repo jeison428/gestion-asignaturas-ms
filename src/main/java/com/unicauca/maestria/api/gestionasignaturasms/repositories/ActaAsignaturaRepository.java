@@ -1,20 +1,20 @@
 package com.unicauca.maestria.api.gestionasignaturasms.repositories;
 
+import com.unicauca.maestria.api.gestionasignaturasms.domain.ActaAsignatura;
 import com.unicauca.maestria.api.gestionasignaturasms.domain.Asignatura;
-import com.unicauca.maestria.api.gestionasignaturasms.domain.DocenteAsignatura;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface DocenteAsignaturaRepository extends JpaRepository<DocenteAsignatura, Long> {
+public interface ActaAsignaturaRepository extends JpaRepository<ActaAsignatura, Long> {
 
     @Query(
             value = "SELECT * " +
-                    "FROM DOCENTE_ASIGNATURA DA " +
-                    "WHERE DA.DICTA_ASIGNATURA = :estado",
+                    "FROM ACTA_ASIGNATURA AA " +
+                    "WHERE AA.IS_ACTA_ASIGNATURA = :estado",
             nativeQuery = true
     )
-    public List<DocenteAsignatura> findByEstado(@Param("estado") Boolean estado);
+    public List<ActaAsignatura> findByEstado(@Param("estado") Boolean estado);
 }

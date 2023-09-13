@@ -1,7 +1,9 @@
 package com.unicauca.maestria.api.gestionasignaturasms.services.asignatura;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.unicauca.maestria.api.gestionasignaturasms.domain.ActaAsignatura;
 import com.unicauca.maestria.api.gestionasignaturasms.domain.Asignatura;
+import com.unicauca.maestria.api.gestionasignaturasms.domain.DocenteAsignatura;
 import com.unicauca.maestria.api.gestionasignaturasms.dtos.AsignaturaCrearDto;
 import com.unicauca.maestria.api.gestionasignaturasms.dtos.AsignaturaListarDto;
 import org.springframework.validation.BindingResult;
@@ -25,5 +27,9 @@ public interface AsignaturaService {
     public boolean existCodigo(Long codigo);
 
     public List<AsignaturaListarDto> buscarTodoPorEstado(Boolean estado);
+
+    public List<DocenteAsignatura> getDocentesAsignaturasByEstado(Boolean estado);
+
+    public List<ActaAsignatura> getActasAsignaturasByEstado(Boolean estado);
 
 }

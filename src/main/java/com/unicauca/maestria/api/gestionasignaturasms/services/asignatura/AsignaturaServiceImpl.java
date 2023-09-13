@@ -20,6 +20,7 @@ import com.unicauca.maestria.api.gestionasignaturasms.mappers.archivos.OficioCre
 import com.unicauca.maestria.api.gestionasignaturasms.mappers.archivos.OficioListarMapper;
 import com.unicauca.maestria.api.gestionasignaturasms.mappers.archivos.OtroDocCrearMapper;
 import com.unicauca.maestria.api.gestionasignaturasms.mappers.archivos.OtroDocListarMapper;
+import com.unicauca.maestria.api.gestionasignaturasms.repositories.ActaAsignaturaRepository;
 import com.unicauca.maestria.api.gestionasignaturasms.repositories.AsignaturaRepository;
 import com.unicauca.maestria.api.gestionasignaturasms.repositories.DocenteAsignaturaRepository;
 import lombok.RequiredArgsConstructor;
@@ -43,10 +44,9 @@ public class AsignaturaServiceImpl implements AsignaturaService {
     private final AsignaturaListarMapper asignaturaListarMapper;
     private final InformacionUnicaAsignatura informacionUnicaAsignatura;
     private final OficioListarMapper oficioListarMapper;
-    private final OficioCrearMapper oficioCrearMapper;
     private final OtroDocListarMapper otroDocListarMapper;
-    private final OtroDocCrearMapper otroDocCrearMapper;
     private final ArchivoClient archivoClient;
+    private final ActaAsignaturaRepository actaAsignaturaRepository;
 
     @Override
     public AsignaturaListarDto crear(AsignaturaCrearDto asignatura, BindingResult result) {
@@ -101,6 +101,7 @@ public class AsignaturaServiceImpl implements AsignaturaService {
             actaAsignaturaTmp = new ActaAsignatura();
             actaAsignaturaTmp.setActa(actaTmp);
             actaAsignaturaTmp.setAsignatura(asignatura);
+            actaAsignaturaTmp.setIsActaAsignatura(true);
             actaAsignaturaList.add(actaAsignaturaTmp);
         }
         return actaAsignaturaList;
@@ -129,13 +130,20 @@ public class AsignaturaServiceImpl implements AsignaturaService {
         }
         actualizarInformacionAsignatura(asignatura, asignaturaBD);
 
+        asignaturaBD.getDocentesAsignaturas().forEach(docenteAsig -> {
+            docenteAsig.setAsignatura(asignaturaBD);
+        });
+
+        asignaturaBD.getActasAsignaturas().forEach(actaAsig -> {
+            actaAsig.setAsignatura(asignaturaBD);
+        });
+
         List<ActaAsignatura> actaAsignaturaList = null;
         if (asignatura.getListaActas() != null && !asignatura.getListaActas().isEmpty()){
             actaAsignaturaList = asignarActasAsignaturas(asignatura.getListaActas(), asignaturaBD);
             if (asignaturaBD.getActasAsignaturas() != null){
                 asignaturaBD.getActasAsignaturas().addAll(actaAsignaturaList);
             }
-//            asignaturaBD.setActasAsignaturas(actaAsignaturaList);
         }
 
         List<DocenteAsignatura> docenteAsignaturaList = null;
@@ -144,28 +152,26 @@ public class AsignaturaServiceImpl implements AsignaturaService {
             if (asignaturaBD.getDocentesAsignaturas() != null){
                 asignaturaBD.getDocentesAsignaturas().addAll(docenteAsignaturaList);
             }
-//            asignaturaBD.setDocentesAsignaturas(docenteAsignaturaList);
         }
 
         Asignatura asignaturaSave = asigRepository.save(asignaturaBD);
 
-//        Asignatura save = asigRepository.save(asignaturaSave);
         return asignaturaListarMapper.toDto(asignaturaSave);
     }
 
     public void actualizarInformacionAsignatura(AsignaturaCrearDto asignatura,Asignatura asignaturaBD) {
-        if (asignatura.getOficioFacultad().getIdDocMaestria().getLinkDocumento().compareToIgnoreCase(asignaturaBD.getOficioFacultad().getIdDocMaestria().getLinkDocumento()) != 0){
+        if (asignatura.getOficioFacultad().getIdDocMaestria().getLinkDocumento().compareToIgnoreCase(asignaturaBD.getOficioFacultad().getIdDocMaestria().getLinkDocumento()) != 0) {
             OficioListarDto oficioTmp = archivoClient.crearOficio(asignatura.getOficioFacultad());
             asignatura.setOficioFacultad(null);
             asignaturaBD.setOficioFacultad(oficioListarMapper.toEntity(oficioTmp));
         }
-        if (asignatura.getContenidoProgramatico().getIdDocMaestria().getLinkDocumento().compareToIgnoreCase(asignaturaBD.getContenidoProgramatico().getIdDocMaestria().getLinkDocumento()) != 0){
+        if (asignatura.getContenidoProgramatico().getIdDocMaestria().getLinkDocumento().compareToIgnoreCase(asignaturaBD.getContenidoProgramatico().getIdDocMaestria().getLinkDocumento()) != 0) {
             OtroDocListarDto contenidoTmp = archivoClient.crearOtroDoc(asignatura.getContenidoProgramatico());
             asignatura.setContenidoProgramatico(null);
             asignaturaBD.setContenidoProgramatico(otroDocListarMapper.toEntity(contenidoTmp));
         }
 
-        if (asignatura.getMicrocurriculo().getIdDocMaestria().getLinkDocumento().compareToIgnoreCase(asignaturaBD.getMicrocurriculo().getIdDocMaestria().getLinkDocumento()) != 0){
+        if (asignatura.getMicrocurriculo().getIdDocMaestria().getLinkDocumento().compareToIgnoreCase(asignaturaBD.getMicrocurriculo().getIdDocMaestria().getLinkDocumento()) != 0) {
             OtroDocListarDto microcurTmp = archivoClient.crearOtroDoc(asignatura.getMicrocurriculo());
             asignatura.setMicrocurriculo(null);
             asignaturaBD.setMicrocurriculo(otroDocListarMapper.toEntity(microcurTmp));
@@ -183,16 +189,20 @@ public class AsignaturaServiceImpl implements AsignaturaService {
         asignaturaBD.setHorasNoPresencial(asignatura.getHorasNoPresencial());
         asignaturaBD.setHorasPresencial(asignatura.getHorasPresencial());
         asignaturaBD.setHorasTotal(asignatura.getHorasTotal());
-        if (Arrays.deepEquals(new List[]{asignaturaBD.getDocentesAsignaturas()}, new List[]{asignatura.getDocentesAsignaturas()})){
-            System.out.println("Entro al if");
-        }
         asignaturaBD.setDocentesAsignaturas(asignatura.getDocentesAsignaturas());
         asignaturaBD.setActasAsignaturas(asignatura.getActasAsignaturas());
     }
 
-    private List<DocenteAsignatura> validateDocentesAsignaturas(List<DocenteAsignatura> listaBody, List<DocenteAsignatura> listaDB){
-        List<DocenteAsignatura> response = new ArrayList<>();
-        for (DocenteAsignatura docAsig: listaDB){
+    private List<ActaAsignatura> validateActasAsignaturas(List<ActaAsignatura> listaBody, List<ActaAsignatura> listaDB){
+        List<ActaAsignatura> response = new ArrayList<>();
+        for (ActaAsignatura actAsig: listaDB){
+            if(listaBody.contains(actAsig)){
+                response.add(actAsig);
+                continue;
+            }else{
+                actaAsignaturaRepository.delete(actAsig);
+                continue;
+            }
 
         }
         return response;
@@ -223,6 +233,16 @@ public class AsignaturaServiceImpl implements AsignaturaService {
     @Override
     public List<AsignaturaListarDto> buscarTodoPorEstado(Boolean estado) {
         return asignaturaListarMapper.toDtoList(this.asigRepository.findByEstado(estado));
+    }
+
+    @Override
+    public List<DocenteAsignatura> getDocentesAsignaturasByEstado(Boolean estado) {
+        return this.docenteAsigRepository.findByEstado(estado);
+    }
+
+    @Override
+    public List<ActaAsignatura> getActasAsignaturasByEstado(Boolean estado) {
+        return this.actaAsignaturaRepository.findByEstado(estado);
     }
 
     private Map<String, String> validacionCampoUnicos(CamposUnicosDto camposUnicos, CamposUnicosDto camposUnicosBD) {

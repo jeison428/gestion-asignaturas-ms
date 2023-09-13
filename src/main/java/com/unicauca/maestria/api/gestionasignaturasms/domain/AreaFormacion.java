@@ -27,7 +27,4 @@ public class AreaFormacion {
     @Column(name = "DESCRIPCION")
     private String descripcion;
 
-//    @OneToMany(mappedBy = "areaFormacion", fetch = FetchType.LAZY)
-//    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "areaFormacion" })
-//    private List<Asignatura> asignaturas;
 }

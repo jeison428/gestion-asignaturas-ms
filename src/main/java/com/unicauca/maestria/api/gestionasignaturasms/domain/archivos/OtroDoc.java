@@ -36,14 +36,4 @@ public class OtroDoc {
     @Column(name = "DESCRIPCION_DOCUMENTO")
     private String descripcionDocumento;
 
-//    @OneToMany(mappedBy = "contenidoProgramatico", cascade = CascadeType.ALL)
-////    @JsonBackReference
-//    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "contenidoProgramatico" })
-//    private List<Asignatura> asignaturasContenidoProgramatico;
-//
-//    @OneToMany(mappedBy = "microcurriculo", cascade = CascadeType.ALL)
-////    @JsonBackReference
-//    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler", "microcurriculo" })
-//    private List<Asignatura> asignaturasMicrocurriculo;
-
 }

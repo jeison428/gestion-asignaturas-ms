@@ -12,9 +12,6 @@ import javax.validation.Valid;
 @FeignClient(name = "gestion-archivos-ms", url = "http://localhost:8020")
 public interface ArchivoClient {
 
-//    @PostMapping("api/actas")
-//    public ActaListarDto crearActa(@RequestBody ActaCrearDto acta, BindingResult result);
-
     @PostMapping("api/oficios")
     public OficioListarDto crearOficio(@RequestBody OficioCrearDto oficio);
 

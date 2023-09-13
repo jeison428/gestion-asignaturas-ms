@@ -1,7 +1,9 @@
 package com.unicauca.maestria.api.gestionasignaturasms.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.unicauca.maestria.api.gestionasignaturasms.domain.ActaAsignatura;
 import com.unicauca.maestria.api.gestionasignaturasms.domain.Asignatura;
+import com.unicauca.maestria.api.gestionasignaturasms.domain.DocenteAsignatura;
 import com.unicauca.maestria.api.gestionasignaturasms.dtos.AsignaturaCrearDto;
 import com.unicauca.maestria.api.gestionasignaturasms.dtos.AsignaturaListarDto;
 import com.unicauca.maestria.api.gestionasignaturasms.services.asignatura.AsignaturaService;
@@ -61,5 +63,15 @@ public class AsignaturaController {
     @PutMapping("/{id}")
     public ResponseEntity<AsignaturaListarDto> editarAsignatura(@PathVariable Long id, @Valid @RequestBody AsignaturaCrearDto asignatura, BindingResult result){
         return ResponseEntity.status(HttpStatus.OK).body(service.editar(id, asignatura, result));
+    }
+
+    @GetMapping("/actas/{estado}")
+    public ResponseEntity<List<ActaAsignatura>> actasAsignaturas(@PathVariable Boolean estado){
+        return ResponseEntity.status(HttpStatus.OK).body(service.getActasAsignaturasByEstado(estado));
+    }
+
+    @GetMapping("/docentes/{estado}")
+    public ResponseEntity<List<DocenteAsignatura>> docentesAsignaturas(@PathVariable Boolean estado){
+        return ResponseEntity.status(HttpStatus.OK).body(service.getDocentesAsignaturasByEstado(estado));
     }
 }
